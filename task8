@@ -1,0 +1,78 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MaterialApp(home: AnimationDemo()));
+
+class AnimationDemo extends StatefulWidget {
+  @override
+  _AnimationDemoState createState() => _AnimationDemoState();
+}
+
+class _AnimationDemoState extends State<AnimationDemo> {
+  // Animation states
+  bool _fadeVisible = true;
+  double _slideOffset = 0;
+  double _turns = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('All Animations (Fade, Slide, Rotate)')),
+      body: Padding(
+        padding: const EdgeInsets.all(18.0),
+        child: Column(
+          children: [
+            // Fade Animation
+            AnimatedOpacity(
+              opacity: _fadeVisible ? 1.0 : 0.0,
+              duration: Duration(seconds: 1),
+              child: Container(
+                width: 180,
+                height: 80,
+                color: Colors.blue,
+                child: Center(child: Text('Fade', style: TextStyle(color: Colors.white, fontSize: 22))),
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              child: Text(_fadeVisible ? 'Fade Out' : 'Fade In'),
+              onPressed: () => setState(() => _fadeVisible = !_fadeVisible),
+            ),
+            Divider(),
+            // Slide Animation
+            AnimatedContainer(
+              duration: Duration(seconds: 1),
+              transform: Matrix4.translationValues(_slideOffset, 0, 0),
+              width: 180,
+              height: 80,
+              color: Colors.purple,
+              child: Center(child: Text('Slide', style: TextStyle(color: Colors.white, fontSize: 22))),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              child: Text(_slideOffset == 0 ? 'Slide Right' : 'Slide Left'),
+              onPressed: () => setState(() => _slideOffset = _slideOffset == 0 ? 100 : 0),
+            ),
+            Divider(),
+            // Rotate Animation
+            AnimatedRotation(
+              turns: _turns,
+              duration: Duration(seconds: 1),
+              child: Container(
+                width: 80,
+                height: 80,
+                color: Colors.orange,
+                child: Center(
+                    child: Text('Rotate', style: TextStyle(color: Colors.white, fontSize: 18))),
+              ),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              child: Text('Rotate 90°'),
+              onPressed: () => setState(() => _turns += 0.25),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
