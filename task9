@@ -1,0 +1,120 @@
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+void main() => runApp(MaterialApp(home: PostsScreen()));
+
+// Model for API data
+class Post {
+  final int id;
+  final String title;
+  final String body;
+  Post({required this.id, required this.title, required this.body});
+  
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      id: json['id'],
+      title: json['title'],
+      body: json['body'],
+    );
+  }
+}
+
+class PostsScreen extends StatefulWidget {
+  @override
+  State<PostsScreen> createState() => _PostsScreenState();
+}
+
+class _PostsScreenState extends State<PostsScreen> {
+  late Future<List<Post>> postsFuture;
+
+  // Fetch API data
+  Future<List<Post>> fetchPosts() async {
+    final response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts'));
+    if (response.statusCode == 200) {
+      List jsonList = jsonDecode(response.body);
+      return jsonList.map((e) => Post.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to fetch posts');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    postsFuture = fetchPosts();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('REST API Data Example')),
+      body: FutureBuilder<List<Post>>(
+        future: postsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator()); // loading[web:41][web:44]
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}')); // error[web:44][web:45]
+          } else if (snapshot.hasData) {
+            final posts = snapshot.data!;
+            return ListView.separated(
+              itemCount: posts.length,
+              separatorBuilder: (context, index) => Divider(),
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                // Fade-in each card with AnimatedOpacity
+                return TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: 1),
+                  duration: Duration(milliseconds: 500 + index * 30),
+                  builder: (context, opacity, child) => Opacity(
+                    opacity: opacity,
+                    child: child,
+                  ),
+                  child: Card(
+                    elevation: 2,
+                    margin: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    child: ListTile(
+                      leading: CircleAvatar(child: Text('${post.id}')),
+                      title: Text(post.title, style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(post.body),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                    ),
+                  ),
+                );
+              },
+            );
+          }
+          return Center(child: Text('No data'));
+        },
+      ),
+    );
+  }
+}
+
+
+pubspec.yaml
+name: task7
+description: "A new Flutter project."
+publish_to: 'none' # private package
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  http: ^1.0.0
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
