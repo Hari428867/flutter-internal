@@ -1,0 +1,85 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'form validation',
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('form validation demo'),
+        ),
+        body: MyForm(),
+      ),
+    );
+  }
+}
+
+class MyForm extends StatefulWidget {
+  @override
+  _MyFormState createState() => _MyFormState();
+}
+
+class _MyFormState extends State<MyForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          TextFormField(
+            decoration: InputDecoration(
+              icon: Icon(Icons.person),
+              hintText: "Enter your full name",
+              labelText: "Name",
+            ),
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              icon: Icon(Icons.phone),
+              hintText: "Enter phone number",
+              labelText: "Phone",
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter your phone number";
+              }
+              return null;
+            },
+          ),
+          TextFormField(
+            decoration: InputDecoration(
+              icon: Icon(Icons.calendar_today), // fixed typo
+              hintText: "Select dob",
+              labelText: "DOB",
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return "Please select your dob";
+              }
+              return null;
+            },
+          ),
+          Container(
+            padding: EdgeInsets.only(left: 100, top: 40),
+            child: ElevatedButton(
+              child: Text('Submit'),
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('data is processing')),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
